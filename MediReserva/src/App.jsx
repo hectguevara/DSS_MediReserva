@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AppointmentForm from './pages/AppointmentForm';
 import MyAppointments from './pages/MyAppointments';
+import EditAppointment from './pages/EditAppointment';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/agendar" element={<PrivateRoute><AppointmentForm /></PrivateRoute>} />
         <Route path="/mis-citas" element={<PrivateRoute><MyAppointments /></PrivateRoute>} />
+        <Route path="/editar-cita/:id" element={<PrivateRoute><EditAppointment /></PrivateRoute>} />
       </Routes>
     </div>
   );

@@ -1,37 +1,56 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { addAppointmentFake } from '../services/appointmentService';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getAppointmentsFake, updateAppointmentFake } from '../services/appointmentService';
 
-function AppointmentForm() {
-  const [fecha, setFecha] = useState('');
-  const [hora, setHora] = useState('');
-  const [especialidad, setEspecialidad] = useState('');
+function EditAppointment() {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const appointmentId = parseInt(id);
+  const allAppointments = getAppointmentsFake();
+  const appointmentToEdit = allAppointments.find(a => a.id === appointmentId);
+
+  const [formData, setFormData] = useState({
+    fecha: '',
+    hora: '',
+    especialidad: '',
+  });
+
+  useEffect(() => {
+    if (appointmentToEdit) {
+      setFormData({
+        fecha: appointmentToEdit.fecha,
+        hora: appointmentToEdit.hora,
+        especialidad: appointmentToEdit.especialidad,
+      });
+    }
+  }, [appointmentToEdit]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const nuevaCita = {
-      fecha,
-      hora,
-      especialidad,
-    };
-
-    addAppointmentFake(nuevaCita);
+    updateAppointmentFake(appointmentId, formData);
     navigate('/mis-citas');
   };
+
+  if (!appointmentToEdit) {
+    return <p className="p-4 text-red-500">Cita no encontrada.</p>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="max-w-xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4">Agendar Cita</h2>
+        <h2 className="text-2xl font-semibold mb-4">Editar Cita</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium">Fecha</label>
             <input
               type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
+              name="fecha"
+              value={formData.fecha}
+              onChange={handleChange}
               className="w-full border px-3 py-2 rounded"
               required
             />
@@ -40,8 +59,9 @@ function AppointmentForm() {
             <label className="block text-sm font-medium">Hora</label>
             <input
               type="time"
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
+              name="hora"
+              value={formData.hora}
+              onChange={handleChange}
               className="w-full border px-3 py-2 rounded"
               required
             />
@@ -49,8 +69,9 @@ function AppointmentForm() {
           <div>
             <label className="block text-sm font-medium">Especialidad</label>
             <select
-              value={especialidad}
-              onChange={(e) => setEspecialidad(e.target.value)}
+              name="especialidad"
+              value={formData.especialidad}
+              onChange={handleChange}
               className="w-full border px-3 py-2 rounded"
               required
             >
@@ -67,8 +88,8 @@ function AppointmentForm() {
               <option value="Urología">Urología</option>
             </select>
           </div>
-          <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            Solicitar Cita
+          <button type="submit" className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+            Guardar Cambios
           </button>
         </form>
       </div>
@@ -76,4 +97,4 @@ function AppointmentForm() {
   );
 }
 
-export default AppointmentForm;
+export default EditAppointment;

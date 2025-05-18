@@ -5,7 +5,7 @@ const dbConfig = require('../config/db.config');
 const pool = new Pool({
     host: 'localhost',
     user: 'postgres',
-    password: '',
+    password: '123456',
     database: 'MediReserva',
     port: 5432,
 });

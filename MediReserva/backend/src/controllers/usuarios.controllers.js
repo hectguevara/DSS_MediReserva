@@ -1,42 +1,39 @@
 const UsuarioModel = require("../models/usuarios.model");
 
-// Se obtienen todos los usuarios de la base de datos
+// Obtener todos los usuarios
 exports.findAll = (req, res) => {
   UsuarioModel.getAll((err, data) => {
     if (err) {
       res.status(500).send({
-        message:
-          err.message ||
-          "Ha ocurrido un error mientras se intentaba obtener los usuarios.",
+        message: err.message || "Error al obtener los usuarios.",
       });
-    } else res.send(data);
+    } else {
+      res.send(data);
+    }
   });
 };
 
-// Se crea y guarda un nuevo usuario
+// Crear nuevo usuario
 exports.create = (req, res) => {
-  if (!req.body) {
-    res.status(400).send({
-      message: "Contenido no puede ser vacío!",
+  if (!req.body || !req.body.nombre || !req.body.correo || !req.body.contrasena) {
+    return res.status(400).send({
+      message: "Faltan campos obligatorios.",
     });
   }
 
-  // Creación de un usuario
-  const usuario = new UsuarioModel({
-    id: 0,
-    usuario: req.body.usuario,
+  const nuevoUsuario = {
+    nombre: req.body.nombre,               // debe coincidir con el campo de la tabla
     correo: req.body.correo,
     contrasena: req.body.contrasena,
-  });
+  };
 
-  // Se guarda el usuario en la base de datos
-  UsuarioModel.create(usuario, (err, data) => {
+  UsuarioModel.create(nuevoUsuario, (err, data) => {
     if (err) {
       res.status(500).send({
-        message:
-          err.message ||
-          "Ha ocurrido un error mientras se intentaba crear el usuario.",
+        message: err.message || "Error al crear el usuario.",
       });
-    } else res.send(data);
+    } else {
+      res.send(data);
+    }
   });
-}
+};

@@ -2,7 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { API_URL } from '../services/config'; // Ruta al archivo config.js
 
+// Esquema de validación con Yup
 const schema = yup.object({
   nombre: yup.string().required("Nombre es obligatorio"),
   email: yup.string().email("Correo inválido").required("Correo es obligatorio"),
@@ -14,8 +16,33 @@ function Register() {
     resolver: yupResolver(schema)
   });
 
-  const onSubmit = data => {
-    console.log("Registro:", data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch(`${API_URL}/usuarios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: data.nombre,           
+          usuario: data.email,         
+          contrasena: data.password      
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Usuario registrado con éxito ✅');
+        console.log('Respuesta del servidor:', result);
+      } else {
+        alert(`Error: ${result.message}`);
+        console.error(result);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      alert('Error de red o servidor');
+    }
   };
 
   return (

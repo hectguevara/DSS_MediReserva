@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import api from '../utils/api';
 
 const schema = yup.object({
   nombre: yup.string().required("Nombre es obligatorio"),

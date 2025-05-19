@@ -2,6 +2,8 @@ const express = require('express');
 const usuariosController = require('./controllers/usuarios.controllers');
 const citasController = require('./controllers/citas.controllers')
 const router = express.Router();
+router.post('/login', usuariosController.login);
+
 
 // Rutas de usuario
 router.get('/usuarios', usuariosController.findAll);

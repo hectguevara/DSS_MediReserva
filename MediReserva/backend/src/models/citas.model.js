@@ -1,36 +1,40 @@
-const sql = require("./db.js");
+const pool = require("./db.js");
 
 const Cita = function (cita) {
-    this.id = cita.id;
     this.especialidad = cita.especialidad;
     this.fecha = cita.fecha;
     this.hora = cita.hora;
 }
 
 Cita.getAll = (result) => {
-    let query = "SELECT * FROM citas";
-    sql.query(query, function (err, results, fields){
-        if (err) {
-            result(null, err);
-            return;
-        }
-        result(null, results);
-    });
+  const query = "SELECT * FROM citas";
+  pool.query(query, (err, res) => {
+    if (err) {
+      result(err, null);
+      return;
+    }
+    result(null, res.rows); 
+  });
 };
 
 Cita.create = (newCita, result) => {
-    sql.query("INSERT INTO citas SET ?", newCita, (err, res) => {
-        if (err) {
-            result(err, null);
-            return;
-        }
-        newCita.id = res.insertId;
-        result(null, { ...newCita });
-    });
+  const { especialidad, fecha, hora } = newCita;
+
+  pool.query(
+    'INSERT INTO citas (especialidad, fecha, hora) VALUES ($1, $2, $3) RETURNING *',
+    [especialidad, fecha, hora],
+    (err, res) => {
+      if (err) {
+        result(err, null);
+        return;
+      }
+      result(null, res.rows[0]);
+    }
+  );
 };
 
 Cita.updateById = (id, cita, result) => {
-    sql.query(
+    pool.query(
         "UPDATE citas SET cita = ?, especialidad = ?, fecha = ?, hora = ? WHERE id = ?",
         [cita.cita, cita.especialidad, cita.fecha, cita.hora, id],
         (err, res) => {
@@ -49,7 +53,7 @@ Cita.updateById = (id, cita, result) => {
 };
 
 Cita.remove = (id, result) => {
-    sql.query("DELETE FROM citas WHERE id = ?", id, (err, res) => {
+    pool.query("DELETE FROM citas WHERE id = ?", id, (err, res) => {
         if (err) {
             result(null, err);
             return;

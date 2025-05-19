@@ -37,3 +37,20 @@ exports.create = (req, res) => {
     }
   });
 };
+exports.login = (req, res) => {
+  const { correo, contrasena } = req.body;
+
+  if (!correo || !contrasena) {
+    return res.status(400).send({ message: "Correo y contraseña son requeridos" });
+  }
+
+  UsuarioModel.findByEmail(correo, (err, user) => {
+    if (err) return res.status(500).json({ message: "Error en el servidor" });
+    if (!user) return res.status(401).json({ message: "Correo no registrado" });
+    if (user.contrasena !== contrasena) {
+      return res.status(401).json({ message: "Contraseña incorrecta" });
+    }
+
+    res.send({ id: user.id, correo: user.correo, nombre: user.nombre });
+  });
+};

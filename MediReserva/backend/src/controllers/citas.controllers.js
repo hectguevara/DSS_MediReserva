@@ -1,82 +1,96 @@
 const CitaModel = require('../models/citas.model');
 
-// Se obtienen todas las citas de la base de datos
+// Obtener todas las citas
 exports.findAll = (req, res) => {
-    CitaModel.getAll((err, data) => {
-        if (err) {
-            res.status(500).send({
-                message:
-                    err.message ||
-                    'Ha ocurrido un error mientras se intentaba obtener las citas.',
-            });
-        }
-        else res.send(data);
-    });
+  CitaModel.getAll((err, data) => {
+    if (err) {
+      res.status(500).send({
+        message:
+          err.message || 'Ha ocurrido un error al obtener las citas.',
+      });
+    } else {
+      res.send(data);
+    }
+  });
 };
 
-// Se crea y guarda una nueva cita
+// Crear una nueva cita
 exports.create = (req, res) => {
-    if (!req.body){
-        res.status(400).send({
-            message: "Contenido no puede ser vacío!",
-        });
+  const { especialidad, fecha, hora } = req.body;
+
+  if (!especialidad || !fecha || !hora) {
+    return res.status(400).send({
+      message: 'Todos los campos (especialidad, fecha, hora) son obligatorios.',
+    });
+  }
+
+  const cita = {
+    id: 0, // Se ignora porque se autogenera
+    especialidad,
+    fecha,
+    hora,
+  };
+
+  CitaModel.create(cita, (err, data) => {
+    if (err) {
+      res.status(500).send({
+        message:
+          err.message || 'Ha ocurrido un error al crear la cita.',
+      });
+    } else {
+      res.status(201).send(data);
     }
-
-    // Creación de una cita
-    const cita = new CitaModel({
-        id: 0,
-        especialidad: req.body.especialidad,
-        fecha: req.body.fecha,
-        hora: req.body.hora,
-    });
-
-    // Se guarda la cita en la base de datos
-    CitaModel.create(cita, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message:
-                    err.message ||
-                    'Ha ocurrido un error mientras se intentaba crear la cita.',
-            });
-        }
-        else res.send(data);
-    });
+  });
 };
 
-// Se actualiza una cita por su id
+// Actualizar una cita por ID
 exports.update = (req, res) => {
-    if (!req.body){
-        res.status(400).send({
-            message: "Contenido no puede ser vacío!",
-        });
-    }
+  const { especialidad, fecha, hora } = req.body;
 
-    CitaModel.updateById(req.params.id, new CitaModel(req.body), (err, data) => {
-        if (err) {
-            if (err.kind === "not_found"){
-                res.status(404).send({
-                    message: `No se encontró la cita con id ${req.params.id}.`,
-                });
-            }
-            else res.status(500).send({
-                message: "Error mientras se actualizaba cita con id" + req.params.id,
-            });
-        } else res.send(data);
+  if (!especialidad || !fecha || !hora) {
+    return res.status(400).send({
+      message: 'Todos los campos son obligatorios para actualizar una cita.',
     });
+  }
+
+  const citaActualizada = {
+    especialidad,
+    fecha,
+    hora,
+  };
+
+  CitaModel.updateById(req.params.id, citaActualizada, (err, data) => {
+    if (err) {
+      if (err.kind === 'not_found') {
+        res.status(404).send({
+          message: `No se encontró la cita con id ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: `Error al actualizar la cita con id ${req.params.id}.`,
+        });
+      }
+    } else {
+      res.send(data);
+    }
+  });
 };
 
-// Se elimina una cita por su id
+// Eliminar una cita por ID
 exports.delete = (req, res) => {
-    CitaModel.remove(req.params.id, (err, data) => {
-        if (err) {
-            if (err.kind === "not_found"){
-                res.status(404).send({
-                    message: `No se encontró la cita con id ${req.params.id}.`,
-                });
-            }
-            else res.status(500).send({
-                message: "No se pudo eliminar cita con id" + req.params.id,
-            });
-        } else res.send({ message: `Cita eliminada correctamente!` });
-    });
-}
+  CitaModel.remove(req.params.id, (err, data) => {
+    if (err) {
+      if (err.kind === 'not_found') {
+        res.status(404).send({
+          message: `No se encontró la cita con id ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: `No se pudo eliminar la cita con id ${req.params.id}.`,
+        });
+      }
+    } else {
+      res.send({ message: 'Cita eliminada correctamente ✅' });
+    }
+  });
+};

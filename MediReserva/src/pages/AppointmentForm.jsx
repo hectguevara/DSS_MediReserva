@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addAppointmentFake } from '../services/appointmentService';
+import { addAppointment } from '../services/appointmentService';
 
 function AppointmentForm() {
   const [fecha, setFecha] = useState('');
@@ -8,17 +8,22 @@ function AppointmentForm() {
   const [especialidad, setEspecialidad] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const nuevaCita = {
+      especialidad,
       fecha,
       hora,
-      especialidad,
     };
 
-    addAppointmentFake(nuevaCita);
-    navigate('/mis-citas');
+    try {
+      await addAppointment(nuevaCita);
+      alert('Cita registrada con éxito ✅');
+      navigate('/mis-citas');
+    } catch (error) {
+      alert('No se pudo registrar la cita ❌');
+    }
   };
 
   return (
@@ -67,7 +72,10 @@ function AppointmentForm() {
               <option value="Urología">Urología</option>
             </select>
           </div>
-          <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          >
             Solicitar Cita
           </button>
         </form>

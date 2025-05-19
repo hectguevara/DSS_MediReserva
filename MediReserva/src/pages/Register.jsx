@@ -25,7 +25,7 @@ function Register() {
         },
         body: JSON.stringify({
           nombre: data.nombre,           
-          usuario: data.email,         
+          correo: data.email,         
           contrasena: data.password      
         }),
       });

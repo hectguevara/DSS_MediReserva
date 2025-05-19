@@ -67,5 +67,32 @@ Usuario.remove = (id, result) => {
     result(null, res);
   });
 };
+Usuario.findByEmail = (correo, result) => {
+  pool.query("SELECT * FROM usuarios WHERE correo = $1", [correo], (err, res) => {
+    if (err) {
+      result(err, null);
+      return;
+    }
+    if (res.rows.length) {
+      result(null, res.rows[0]);
+    } else {
+      result(null, null);
+    }
+  });
+};
+Usuario.findByCorreo = (correo, result) => {
+  pool.query("SELECT * FROM usuarios WHERE correo = $1", [correo], (err, res) => {
+    if (err) {
+      result(err, null);
+      return;
+    }
+
+    if (res.rows.length === 0) {
+      result(null, null); // no encontrado
+    } else {
+      result(null, res.rows[0]);
+    }
+  });
+};
 
 module.exports = Usuario;

@@ -1,1 +1,1 @@
-export const API_URL = 'http://localhost:3000/api';
+export const API_URL = 'https://directus-backend-y9fe.onrender.com';

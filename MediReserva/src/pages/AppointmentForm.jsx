@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addAppointment } from '../services/appointmentService';
+import { addAppointment, getAppointments, deleteAppointment } from '../services/appointmentService';
 
 function AppointmentForm() {
   const [fecha, setFecha] = useState('');

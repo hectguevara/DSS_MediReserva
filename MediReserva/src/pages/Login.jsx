@@ -1,20 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/authService';
+import { loginUserFake } from '../services/authService';
 
 function Login() {
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    const res = await loginUser(email, password);
+    const res = loginUserFake(email, password);
     if (res.success) {
       navigate('/mis-citas');
     } else {
-      alert(res.message || "Credenciales inválidas");
+      alert("Credenciales inválidas");
     }
   };
 

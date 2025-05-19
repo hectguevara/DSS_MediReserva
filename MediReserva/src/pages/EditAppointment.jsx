@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAppointmentsFake, updateAppointmentFake } from '../services/appointmentService';
+import { getAppointments, updateAppointment } from '../services/appointmentService';
 
 function EditAppointment() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const appointmentId = parseInt(id);
-  const allAppointments = getAppointmentsFake();
-  const appointmentToEdit = allAppointments.find(a => a.id === appointmentId);
-
   const [formData, setFormData] = useState({
     fecha: '',
     hora: '',
@@ -16,28 +12,43 @@ function EditAppointment() {
   });
 
   useEffect(() => {
-    if (appointmentToEdit) {
-      setFormData({
-        fecha: appointmentToEdit.fecha,
-        hora: appointmentToEdit.hora,
-        especialidad: appointmentToEdit.especialidad,
-      });
+    async function fetchAppointment() {
+      try {
+        const appointments = await getAppointments();
+        const appointment = appointments.find(a => a.id === parseInt(id));
+        if (appointment) {
+          setFormData({
+            fecha: appointment.fecha,
+            hora: appointment.hora,
+            especialidad: appointment.especialidad,
+          });
+        } else {
+          alert('Cita no encontrada');
+          navigate('/mis-citas');
+        }
+      } catch (error) {
+        console.error('Error al cargar la cita:', error);
+        alert('Error al cargar la cita');
+      }
     }
-  }, [appointmentToEdit]);
+
+    fetchAppointment();
+  }, [id, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateAppointmentFake(appointmentId, formData);
-    navigate('/mis-citas');
+    try {
+      await updateAppointment(id, formData);
+      alert('Cita actualizada con éxito ✅');
+      navigate('/mis-citas');
+    } catch (error) {
+      alert('Error al actualizar cita');
+    }
   };
-
-  if (!appointmentToEdit) {
-    return <p className="p-4 text-red-500">Cita no encontrada.</p>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">

@@ -3,8 +3,7 @@ import { API_URL } from './config';
 export async function getAppointments() {
   try {
     const response = await fetch(`${API_URL}/citas`);
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Error al obtener citas:', error);
     throw error;
@@ -22,12 +21,29 @@ export async function addAppointment(newAppointment) {
     });
 
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || 'Error al registrar la cita');
-    }
+    if (!response.ok) throw new Error(data.message || 'Error al registrar cita');
     return data;
   } catch (error) {
     console.error('Error al registrar cita:', error);
+    throw error;
+  }
+}
+
+export async function updateAppointment(id, updatedData) {
+  try {
+    const response = await fetch(`${API_URL}/citas/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedData)
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Error al actualizar cita');
+    return data;
+  } catch (error) {
+    console.error('Error al actualizar cita:', error);
     throw error;
   }
 }

@@ -1,6 +1,56 @@
+<<<<<<< Updated upstream
 export function getAppointmentsFake() {
   return [
     { id: 1, fecha: "2025-05-20", hora: "10:00", especialidad: "Pediatría" },
     { id: 2, fecha: "2025-05-21", hora: "14:00", especialidad: "Medicina General" }
   ];
 }
+=======
+import { API_URL } from './config';
+
+export async function getAppointments() {
+  try {
+    const response = await fetch(`${API_URL}/citas`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al obtener citas:', error);
+    throw error;
+  }
+}
+
+export async function addAppointment(newAppointment) {
+  try {
+    const response = await fetch(`${API_URL}/citas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newAppointment)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al registrar la cita');
+    }
+    return data;
+  } catch (error) {
+    console.error('Error al registrar cita:', error);
+    throw error;
+  }
+}
+
+export async function deleteAppointment(id) {
+  try {
+    const response = await fetch(`${API_URL}/citas/${id}`, {
+      method: 'DELETE'
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al eliminar cita:', error);
+    throw error;
+  }
+}
+>>>>>>> Stashed changes

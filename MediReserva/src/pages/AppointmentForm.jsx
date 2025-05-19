@@ -1,11 +1,36 @@
+<<<<<<< Updated upstream
 import React from 'react';
 import { useForm } from 'react-hook-form';
+=======
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { addAppointment } from '../services/appointmentService';
+>>>>>>> Stashed changes
 
 function AppointmentForm() {
   const { register, handleSubmit } = useForm();
 
+<<<<<<< Updated upstream
   const onSubmit = (data) => {
     console.log('Cita agendada:', data);
+=======
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const nuevaCita = {
+      especialidad,
+      fecha,
+      hora,
+    };
+
+    try {
+      await addAppointment(nuevaCita);
+      alert('Cita registrada con éxito ✅');
+      navigate('/mis-citas');
+    } catch (error) {
+      alert('No se pudo registrar la cita ❌');
+    }
+>>>>>>> Stashed changes
   };
 
   return (
@@ -20,6 +45,7 @@ function AppointmentForm() {
               <option value="pediatría">Pediatría</option>
             </select>
           </div>
+<<<<<<< Updated upstream
 
           <div>
             <label className="block mb-1">Fecha</label>
@@ -34,6 +60,11 @@ function AppointmentForm() {
           <button
             type="submit"
             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded"
+=======
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+>>>>>>> Stashed changes
           >
             Solicitar Cita
           </button>

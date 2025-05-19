@@ -15,8 +15,38 @@ function Register() {
     resolver: yupResolver(schema)
   });
 
+<<<<<<< Updated upstream
   const onSubmit = data => {
     console.log("Registro:", data);
+=======
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch(`${API_URL}/usuarios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: data.nombre,           
+          correo: data.email,         
+          contrasena: data.password      
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Usuario registrado con éxito ✅');
+        console.log('Respuesta del servidor:', result);
+      } else {
+        alert(`Error: ${result.message}`);
+        console.error(result);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      alert('Error de red o servidor');
+    }
+>>>>>>> Stashed changes
   };
 
   return (

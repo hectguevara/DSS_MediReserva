@@ -1,8 +1,9 @@
 import { API_URL } from './config';
 
-export async function getAppointments() {
+// Obtener citas del usuario actual
+export async function getAppointments(userId) {
   try {
-    const response = await fetch(`${API_URL}/citas`);
+    const response = await fetch(`${API_URL}/citas?usuario_id=${userId}`);
     return await response.json();
   } catch (error) {
     console.error('Error al obtener citas:', error);

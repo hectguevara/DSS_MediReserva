@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addAppointment, getAppointments, deleteAppointment } from '../services/appointmentService';
+import { addAppointment } from '../services/appointmentService';
 
 function AppointmentForm() {
   const [fecha, setFecha] = useState('');
@@ -11,10 +11,19 @@ function AppointmentForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Obtener el usuario logueado desde localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!user || !user.id) {
+      alert('Usuario no identificado. Inicia sesión nuevamente.');
+      return;
+    }
+
     const nuevaCita = {
       especialidad,
       fecha,
       hora,
+      usuario_id: user.id, // se envía al backend
     };
 
     try {
@@ -23,6 +32,7 @@ function AppointmentForm() {
       navigate('/mis-citas');
     } catch (error) {
       alert('No se pudo registrar la cita ❌');
+      console.error(error);
     }
   };
 

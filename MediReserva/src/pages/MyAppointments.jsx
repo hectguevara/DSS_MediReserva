@@ -1,41 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { deleteAppointment } from '../services/appointmentService';
-import { API_URL } from '../services/config';
+import { getAppointments, deleteAppointment } from '../services/appointmentService';
 
 function MyAppointments() {
   const [appointments, setAppointments] = useState([]);
   const navigate = useNavigate();
 
-  const fetchAppointments = async () => {
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || !user.id) {
-      alert("No has iniciado sesión.");
+      alert('Debes iniciar sesión');
       return;
     }
 
-    try {
-      const response = await fetch(`${API_URL}/citas/usuario/${user.id}`);
-      const data = await response.json();
-      setAppointments(data);
-    } catch (error) {
-      console.error("Error al obtener citas:", error);
-      alert("No se pudieron cargar las citas.");
+    async function fetchData() {
+      try {
+        const citas = await getAppointments(user.id);
+        setAppointments(citas);
+      } catch (error) {
+        console.error('Error al cargar citas:', error);
+      }
     }
-  };
 
-  useEffect(() => {
-    fetchAppointments();
+    fetchData();
   }, []);
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Estás seguro que deseas eliminar esta cita?")) {
       try {
         await deleteAppointment(id);
-        fetchAppointments(); // Recargar citas
-      } catch (err) {
-        console.error("Error al eliminar cita:", err);
-        alert("No se pudo eliminar la cita.");
+        setAppointments(prev => prev.filter(cita => cita.id !== id));
+      } catch (error) {
+        console.error("Error al eliminar cita:", error);
       }
     }
   };

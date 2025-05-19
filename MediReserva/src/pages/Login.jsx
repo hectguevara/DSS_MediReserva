@@ -1,20 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUserFake } from '../services/authService';
+import { loginUser } from '../services/authService';
 
 function Login() {
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    const res = loginUserFake(email, password);
-    if (res.success) {
+    const res = await loginUser(email, password);
+
+    if (res.success && res.user) {
+      // Guardar solo si la respuesta contiene un usuario válido
+      localStorage.setItem('user', JSON.stringify(res.user));
       navigate('/mis-citas');
     } else {
-      alert("Credenciales inválidas");
+      alert(res.message || "Credenciales inválidas");
     }
   };
 

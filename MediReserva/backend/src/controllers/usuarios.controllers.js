@@ -22,7 +22,7 @@ exports.create = (req, res) => {
   }
 
   const nuevoUsuario = {
-    nombre: req.body.nombre,               // debe coincidir con el campo de la tabla
+    nombre: req.body.nombre,
     correo: req.body.correo,
     contrasena: req.body.contrasena,
   };
@@ -37,6 +37,8 @@ exports.create = (req, res) => {
     }
   });
 };
+
+// Inicio de sesión
 exports.login = (req, res) => {
   const { correo, contrasena } = req.body;
 
@@ -47,10 +49,19 @@ exports.login = (req, res) => {
   UsuarioModel.findByEmail(correo, (err, user) => {
     if (err) return res.status(500).json({ message: "Error en el servidor" });
     if (!user) return res.status(401).json({ message: "Correo no registrado" });
-    if (user.contrasena !== contrasena) {
+
+    // Validar usando el nombre real de la columna con ñ
+    if (user.contraseña !== contrasena) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    res.send({ id: user.id, correo: user.correo, nombre: user.nombre });
+    res.send({
+      autenticado: true,
+      usuario: {
+        id: user.id,
+        correo: user.correo,
+        nombre: user.nombre_completo
+      }
+    });
   });
 };

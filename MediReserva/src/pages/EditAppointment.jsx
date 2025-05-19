@@ -12,9 +12,16 @@ function EditAppointment() {
   });
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.id) {
+      alert('Debes iniciar sesión');
+      navigate('/');
+      return;
+    }
+
     async function fetchAppointment() {
       try {
-        const appointments = await getAppointments();
+        const appointments = await getAppointments(user.id); // citas del usuario
         const appointment = appointments.find(a => a.id === parseInt(id));
         if (appointment) {
           setFormData({
@@ -23,12 +30,13 @@ function EditAppointment() {
             especialidad: appointment.especialidad,
           });
         } else {
-          alert('Cita no encontrada');
+          alert('Cita no encontrada o no autorizada');
           navigate('/mis-citas');
         }
       } catch (error) {
         console.error('Error al cargar la cita:', error);
         alert('Error al cargar la cita');
+        navigate('/mis-citas');
       }
     }
 
@@ -41,6 +49,7 @@ function EditAppointment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await updateAppointment(id, formData);
       alert('Cita actualizada con éxito ✅');

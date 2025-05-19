@@ -39,7 +39,7 @@ function MyAppointments() {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4">Mis Citas</h2>
+        <h2 className="text-2xl font-semibold mb-4">Citas</h2>
         {appointments.length === 0 ? (
           <p>No tienes citas registradas.</p>
         ) : (

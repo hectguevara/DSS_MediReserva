@@ -1,47 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { API_URL } from '../services/config'; // Ruta al archivo config.js
+import { useNavigate } from 'react-router-dom';
+import { registerUser, getRoles } from '../services/authService';
 
 // Esquema de validación con Yup
 const schema = yup.object({
-  nombre: yup.string().required("Nombre es obligatorio"),
   email: yup.string().email("Correo inválido").required("Correo es obligatorio"),
-  password: yup.string().min(6, "Mínimo 6 caracteres").required("Contraseña es obligatoria")
+  password: yup.string().min(6, "Mínimo 6 caracteres").required("Contraseña es obligatoria"),
+  first_name: yup.string().required("Nombre es obligatorio"),
+  role: yup.string().required("El rol es obligatorio")
 });
 
 function Register() {
+  const navigate = useNavigate();
+  const [roles, setRoles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   });
 
-  const onSubmit = async (data) => {
+  useEffect(() => {
+    loadRoles();
+  }, []);
+
+  const loadRoles = async () => {
     try {
-      const response = await fetch(`${API_URL}/usuarios`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          nombre: data.nombre,           
-          correo: data.email,         
-          contrasena: data.password      
-        }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert('Usuario registrado con éxito ✅');
-        console.log('Respuesta del servidor:', result);
+      const response = await getRoles();
+      if (response.success) {
+        setRoles(response.data);
       } else {
-        alert(`Error: ${result.message}`);
-        console.error(result);
+        alert(response.message || 'Error al cargar los roles');
       }
     } catch (error) {
-      console.error('Error en la solicitud:', error);
-      alert('Error de red o servidor');
+      alert('Error al cargar los roles');
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await registerUser({
+        email: data.email,
+        password: data.password,
+        first_name: data.first_name,
+        role: data.role
+      });
+
+      if (response.success) {
+        alert('Usuario registrado con éxito ✅');
+        navigate('/');
+      } else {
+        alert(response.message || 'Error al registrar usuario');
+      }
+    } catch (error) {
+      alert(error.message || 'Error al registrar usuario');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -52,18 +68,18 @@ function Register() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div>
             <input
-              {...register("nombre")}
-              placeholder="Nombre completo"
-              className="border border-gray-300 p-2 rounded w-full"
+              {...register("first_name")}
+              placeholder="Nombre"
+              className="border border-gray-300 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <p className="text-red-500 text-sm">{errors.nombre?.message}</p>
+            <p className="text-red-500 text-sm">{errors.first_name?.message}</p>
           </div>
 
           <div>
             <input
               {...register("email")}
               placeholder="Correo"
-              className="border border-gray-300 p-2 rounded w-full"
+              className="border border-gray-300 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-red-500 text-sm">{errors.email?.message}</p>
           </div>
@@ -73,16 +89,34 @@ function Register() {
               {...register("password")}
               type="password"
               placeholder="Contraseña"
-              className="border border-gray-300 p-2 rounded w-full"
+              className="border border-gray-300 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-red-500 text-sm">{errors.password?.message}</p>
           </div>
 
+          <div>
+            <select
+              {...register("role")}
+              className="border border-gray-300 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Seleccionar rol</option>
+              {roles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-red-500 text-sm">{errors.role?.message}</p>
+          </div>
+
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded"
+            disabled={isLoading}
+            className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            Registrarse
+            {isLoading ? 'Registrando...' : 'Registrarse'}
           </button>
         </form>
       </div>
